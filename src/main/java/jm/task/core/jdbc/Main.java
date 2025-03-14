@@ -2,29 +2,27 @@ package jm.task.core.jdbc;
 
 
 import jm.task.core.jdbc.util.Util;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+
 
 public class Main {
     public static void main(String[] args) {
-        Connection connection = null;
-        PreparedStatement preparedStatement = null;
+        Session session = Util.getSessionFactory().openSession();
+        Transaction transaction = null;
+
         try {
-            connection = Util.getConnection();
-        } catch (SQLException e) {
+            transaction = session.beginTransaction();
+            transaction.commit();
+
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             e.printStackTrace();
         } finally {
-            try {
-                if (preparedStatement != null) {
-                    preparedStatement.close();
-                }
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+            session.close();
+            Util.shutdown();
         }
     }
 }
