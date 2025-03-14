@@ -74,11 +74,10 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public List<User> getAllUsers() {
-
-        Session session = Util.getSessionFactory().openSession();
-        Transaction transaction = null;
         List<User> users = null;
-        try {
+        Transaction transaction = null;
+
+        try (Session session = Util.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             users = session.createQuery("from User", User.class).getResultList();
             transaction.commit();
@@ -87,17 +86,14 @@ public class UserDaoHibernateImpl implements UserDao {
                 transaction.rollback();
             }
             e.printStackTrace();
-        } finally {
-            session.close();
         }
         return users;
     }
 
     @Override
     public void cleanUsersTable() {
-        Session session = Util.getSessionFactory().openSession();
         Transaction transaction = null;
-        try {
+        try (Session session = Util.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             session.createQuery("delete from User").executeUpdate();
             transaction.commit();
@@ -106,8 +102,6 @@ public class UserDaoHibernateImpl implements UserDao {
                 transaction.rollback();
             }
             e.printStackTrace();
-        } finally {
-            session.close();
         }
     }
 }
