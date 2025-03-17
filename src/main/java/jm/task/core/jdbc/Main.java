@@ -1,28 +1,26 @@
 package jm.task.core.jdbc;
 
-
+import jm.task.core.jdbc.service.UserService;
+import jm.task.core.jdbc.service.UserServiceImpl;
 import jm.task.core.jdbc.util.Util;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-
 
 public class Main {
     public static void main(String[] args) {
-        Session session = Util.getSessionFactory().openSession();
-        Transaction transaction = null;
+        UserService userService = new UserServiceImpl();
 
-        try {
-            transaction = session.beginTransaction();
-            transaction.commit();
+        userService.createUsersTable();
 
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        } finally {
-            session.close();
-            Util.shutdown();
-        }
+        userService.saveUser("Oleg", "Olegov", (byte) 30);
+        userService.saveUser("Alex", "Petrov", (byte) 25);
+        userService.saveUser("Nikita", "Sergeev", (byte) 35);
+        userService.saveUser("Vladimir", "Ivanov", (byte) 28);
+
+        userService.getAllUsers().forEach(System.out::println);
+
+        userService.cleanUsersTable();
+
+        userService.dropUsersTable();
+
+        Util.shutdown();
     }
 }
